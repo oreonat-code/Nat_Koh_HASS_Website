@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frankenstein Combined Full</title>
+
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: Georgia, 'Times New Roman', serif;
+    overflow-x: hidden;
+}
+
+section { height: 200vh; position: relative; }
+#sec-curtain { height: 300vh; }
+#sec-blackout { height: 25vh; }
+#sec-rejection { height: 300vh; }
+
+#curtain-video-wrapper {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 100;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+}
+
+#curtain-video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    transform: scale(1.5);
+    will-change: transform;
+}
+
+#curtain-darkness {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #000;
+    opacity: 0;
+    z-index: 101;
+    pointer-events: none;
+    will-change: opacity;
+}
+
+.scene-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    opacity: 0;
+    pointer-events: none;
+    background-size: cover;
+    background-position: center;
+    will-change: opacity, transform, filter;
+}
+
+#frankenstein-layer {
+    background-image: url('images/frankenstein.jpeg');
+    background-position: center 20%;
+    z-index: 20;
+}
+
+#black-layer {
+    background: #000;
+    z-index: 21;
+}
+
+#contemplation-layer {
+    background-image: url('images/Contemplation.png');
+    z-index: 22;
+    clip-path: circle(0% at 50% 50%);
+}
+
+#rejection-video-wrapper {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 23;
+    overflow: hidden;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    will-change: opacity;
+}
+
+#rejection-video {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    transform: scale(1.1);
+    will-change: transform;
+}
+
+#smoke-left, #smoke-right {
+    position: fixed;
+    top: 0;
+    width: 60vw;
+    height: 100vh;
+    z-index: 24;
+    pointer-events: none;
+    display: none;
+    will-change: transform, opacity;
+}
+
+#smoke-left {
+    left: 0;
+    background: linear-gradient(to right,
+        rgba(0,0,0,1) 0%,
+        rgba(20,20,20,0.95) 20%,
+        rgba(40,40,40,0.8) 50%,
+        rgba(30,30,30,0.5) 75%,
+        rgba(0,0,0,0) 100%
+    );
+}
+
+#smoke-right {
+    right: 0;
+    background: linear-gradient(to left,
+        rgba(0,0,0,1) 0%,
+        rgba(20,20,20,0.95) 20%,
+        rgba(40,40,40,0.8) 50%,
+        rgba(30,30,30,0.5) 75%,
+        rgba(0,0,0,0) 100%
+    );
+}
+
+#learning-layer {
+    background-image: url('images/learning.jpg');
+    z-index: 25;
+}
+
+#violence-layer {
+    background-image: url('images/violence.jpg');
+    z-index: 26;
+}
+
+#violence-red-curtain {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(140, 0, 0, 0.95);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 27;
+    display: none;
+    will-change: opacity;
+}
+
+#break-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 28;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    pointer-events: none;
+    opacity: 0;
+}
+
+.break-fragment {
+    background-image: url('images/violence.jpg');
+    background-size: 400% 300%;
+    width: 100%; height: 100%;
+    opacity: 1;
+}
+
+#confrontation-layer {
+    background-image: url('images/confrontation.jpg');
+    z-index: 29;
+}
+
+#ending-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: none;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 40;
+}
+
+#ending-layer h1 {
+    font-size: 2.5rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 2rem;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.9), 0 0 40px rgba(0,0,0,0.6);
+}
+
+#ending-layer h1, #answer-reveal, .btn-row button {
+    text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+}
+
+.btn-row { display: flex; gap: 1rem; margin-top: 1rem; }
+
+.btn-row button {
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-family: Georgia, serif;
+    border: 2px solid #666;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.btn-row button:hover {
+    border-color: #c44;
+    color: #c44;
+    background: rgba(200, 50, 50, 0.1);
+}
+
+.btn-row button.selected {
+    border-color: #f55;
+    color: #f55;
+    background: rgba(200, 50, 50, 0.15);
+}
+
+#answer-reveal {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 500px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    letter-spacing: 0.03em;
+}
+
+#answer-reveal.visible { opacity: 1; }
+
+</style>
+</head>
+
+<body>
+
+<div id="curtain-video-wrapper">
+    <video id="curtain-video" muted playsinline preload="auto" src="VIDEOS/Black_Curtains_Stage_Opening_Animation.mp4"></video>
+</div>
+<div id="curtain-darkness"></div>
+
+<section id="sec-curtain"></section>
+<section id="sec-frankenstein"></section>
+<section id="sec-blackout"></section>
+<section id="sec-contemplation"></section>
+<section id="sec-rejection"></section>
+<section id="sec-learning"></section>
+<section id="sec-violence"></section>
+<section id="sec-break"></section>
+<section id="sec-ending"></section>
+
+<div class="scene-layer" id="frankenstein-layer"></div>
+<div class="scene-layer" id="black-layer"></div>
+<div class="scene-layer" id="contemplation-layer"></div>
+<div id="rejection-video-wrapper">
+    <video id="rejection-video" muted playsinline preload="auto" src="VIDEOS/Rejection.mp4"></video>
+</div>
+<div id="smoke-left"></div>
+<div id="smoke-right"></div>
+<div class="scene-layer" id="learning-layer"></div>
+<div class="scene-layer" id="violence-layer"></div>
+<div id="violence-red-curtain"></div>
+<div id="break-container"></div>
+<div class="scene-layer" id="confrontation-layer"></div>
+
+<div id="ending-layer">
+    <h1>Who is the real monster?</h1>
+    <div class="btn-row">
+        <button data-answer="victor">Victor</button>
+        <button data-answer="creature">Creature</button>
+        <button data-answer="both">Both</button>
+    </div>
+    <div id="answer-reveal"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const clamp = (v, lo=0, hi=1) => Math.max(lo, Math.min(hi, v));
+const progress = (rect, vh) => clamp(-rect.top / vh);
+
+const curtainVideo = $('#curtain-video');
+const curtainWrapper = $('#curtain-video-wrapper');
+const curtainDarkness = $('#curtain-darkness');
+
+const frankensteinLayer = $('#frankenstein-layer');
+const blackLayer = $('#black-layer');
+const contemplationLayer = $('#contemplation-layer');
+const rejectionWrapper = $('#rejection-video-wrapper');
+const rejectionVideo = $('#rejection-video');
+const smokeLeft = $('#smoke-left');
+const smokeRight = $('#smoke-right');
+const learningLayer = $('#learning-layer');
+const violenceLayer = $('#violence-layer');
+const violenceRedCurtain = $('#violence-red-curtain');
+const breakContainer = $('#break-container');
+const confrontationLayer = $('#confrontation-layer');
+const endingLayer = $('#ending-layer');
+
+const secCurtain = $('#sec-curtain');
+const secFrankenstein = $('#sec-frankenstein');
+const secBlackout = $('#sec-blackout');
+const secContemplation = $('#sec-contemplation');
+const secRejection = $('#sec-rejection');
+const secLearning = $('#sec-learning');
+const secViolence = $('#sec-violence');
+const secBreak = $('#sec-break');
+const secEnding = $('#sec-ending');
+
+const CURTAIN_START = 0;
+const CURTAIN_END = 6;
+const REJECTION_START = 4;
+const REJECTION_END = 8;
+const FRAME_FPS = 30;
+
+const curtainState = { bitmaps: [], canvas: null, ctx: null, lastIdx: -1, ready: false };
+const rejectionState = { bitmaps: [], canvas: null, ctx: null, lastIdx: -1, ready: false };
+
+function extractFrames(video, start, end, state, wrapper, cssTransform) {
+    const duration = end - start;
+    const count = Math.ceil(duration * FRAME_FPS);
+
+    const c = document.createElement('canvas');
+    c.style.cssText = `width:100vw;height:100vh;object-fit:cover;transform:${cssTransform};will-change:transform;display:none;`;
+    wrapper.insertBefore(c, video);
+
+    const grabCvs = document.createElement('canvas');
+    const grabCtx = grabCvs.getContext('2d', { willReadFrequently: true });
+
+    function initSize() {
+        const w = video.videoWidth || 1920;
+        const h = video.videoHeight || 1080;
+        const scale = Math.min(1, 1280 / w);
+        const cw = Math.round(w * scale);
+        const ch = Math.round(h * scale);
+        c.width = cw;
+        c.height = ch;
+        grabCvs.width = cw;
+        grabCvs.height = ch;
+    }
+
+    initSize();
+    state.canvas = c;
+    state.ctx = c.getContext('2d');
+
+    let i = 0;
+    function grabNext() {
+        if (i >= count) {
+            state.ready = true;
+            video.style.display = 'none';
+            c.style.display = '';
+            return;
+        }
+        video.currentTime = start + (i / count) * duration;
+        function onSeeked() {
+            video.removeEventListener('seeked', onSeeked);
+            if (i === 0) initSize();
+            grabCtx.drawImage(video, 0, 0, grabCvs.width, grabCvs.height);
+            state.bitmaps.push(grabCtx.getImageData(0, 0, grabCvs.width, grabCvs.height));
+            i++;
+            requestAnimationFrame(grabNext);
+        }
+        video.addEventListener('seeked', onSeeked);
+    }
+    grabNext();
+}
+
+function drawFrame(state, p) {
+    if (!state.ready || state.bitmaps.length === 0) return;
+    const len = state.bitmaps.length;
+    const idx = Math.min(Math.round(p * (len - 1)), len - 1);
+    if (idx === state.lastIdx) return;
+    state.lastIdx = idx;
+    state.ctx.putImageData(state.bitmaps[idx], 0, 0);
+}
+
+let curtainInited = false;
+let rejectionInited = false;
+
+function tryInitCurtain() {
+    if (curtainInited || curtainVideo.readyState < 2) return;
+    curtainInited = true;
+    extractFrames(curtainVideo, CURTAIN_START, CURTAIN_END, curtainState, curtainWrapper, 'scale(1.5)');
+}
+
+function tryInitRejection() {
+    if (rejectionInited || rejectionVideo.readyState < 2) return;
+    rejectionInited = true;
+    extractFrames(rejectionVideo, REJECTION_START, REJECTION_END, rejectionState, rejectionWrapper, 'scale(1.1)');
+}
+
+curtainVideo.addEventListener('loadeddata', tryInitCurtain);
+rejectionVideo.addEventListener('loadeddata', tryInitRejection);
+curtainVideo.load();
+rejectionVideo.load();
+tryInitCurtain();
+tryInitRejection();
+
+const cols = 4, rows = 3;
+const fragments = [];
+const fragData = [];
+for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+        const frag = document.createElement('div');
+        frag.className = 'break-fragment';
+        const bgX = (c / (cols - 1)) * 100;
+        const bgY = (r / (rows - 1)) * 100;
+        frag.style.backgroundPosition = `${bgX}% ${bgY}%`;
+        fragData.push({
+            tx: (Math.random() - 0.5) * 200,
+            ty: (Math.random() - 0.5) * 200,
+            rot: (Math.random() - 0.5) * 720
+        });
+        breakContainer.appendChild(frag);
+        fragments.push(frag);
+    }
+}
+
+const answerTexts = {
+    victor: 'Victor Frankenstein created the horror but refused to take responsibility. His ambition blinded him to the consequences — abandoning his creation set the tragedy in motion.',
+    creature: 'The Creature was born innocent, but cruelty and rejection twisted him into something monstrous. Society shaped the monster he became.',
+    both: 'Both are monstrous in their own way. Victor through neglect and hubris, the Creature through revenge. They are mirror images of each other — creator and creation, locked in destruction.'
+};
+
+document.querySelectorAll('.btn-row button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-row button').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        const reveal = $('#answer-reveal');
+        reveal.textContent = answerTexts[btn.dataset.answer];
+        reveal.classList.add('visible');
+    });
+});
+
+let ticking = false;
+
+function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { ticking = false; update(); });
+}
+
+function update() {
+    const vh = window.innerHeight;
+
+    const curtainRect = secCurtain.getBoundingClientRect();
+    const pCurtain = clamp(-curtainRect.top / curtainRect.height);
+
+    if (pCurtain < 1) {
+        curtainWrapper.style.display = 'flex';
+        curtainDarkness.style.display = 'block';
+
+        if (curtainState.ready) {
+            drawFrame(curtainState, pCurtain);
+        } else if (curtainVideo.readyState >= 2) {
+            const tt = CURTAIN_START + pCurtain * (CURTAIN_END - CURTAIN_START);
+            if (Math.abs(curtainVideo.currentTime - tt) > 0.3) curtainVideo.currentTime = tt;
+        }
+
+        curtainDarkness.style.opacity = pCurtain;
+        curtainWrapper.style.opacity = 1 - pCurtain * 0.3;
+    } else {
+        curtainWrapper.style.display = 'none';
+        curtainDarkness.style.display = 'none';
+    }
+
+    const frankRect = secFrankenstein.getBoundingClientRect();
+    const pFrank = progress(frankRect, vh);
+
+    if (frankRect.top < vh && frankRect.bottom > 0) {
+        const fadeIn = clamp(pFrank * 3);
+        const fadeOut = clamp((pFrank - 0.6) / 0.4);
+        frankensteinLayer.style.opacity = fadeIn * (1 - fadeOut);
+    } else {
+        frankensteinLayer.style.opacity = 0;
+    }
+
+    const blackRect = secBlackout.getBoundingClientRect();
+    const pBlack = clamp(-blackRect.top / blackRect.height);
+
+    if (blackRect.top < vh && blackRect.bottom > 0) {
+        const fadeIn = clamp(pBlack * 4);
+        const fadeOut = clamp((pBlack - 0.5) / 0.5);
+        blackLayer.style.opacity = fadeIn * (1 - fadeOut);
+    } else {
+        blackLayer.style.opacity = 0;
+    }
+
+    const contRect = secContemplation.getBoundingClientRect();
+    const pCont = progress(contRect, vh);
+
+    if (contRect.top < vh && contRect.bottom > 0) {
+        contemplationLayer.style.opacity = 1;
+        contemplationLayer.style.clipPath = `circle(${pCont * 80}% at 50% 50%)`;
+    } else if (contRect.bottom <= 0) {
+        contemplationLayer.style.opacity = 0;
+    }
+
+    const rejRect = secRejection.getBoundingClientRect();
+    const pRej = clamp(-rejRect.top / rejRect.height);
+
+    if (rejRect.top < vh && rejRect.bottom > 0) {
+        contemplationLayer.style.opacity = 1 - clamp(pRej * 3);
+
+        rejectionWrapper.style.display = 'flex';
+
+        if (rejectionState.ready) {
+            drawFrame(rejectionState, pRej);
+        } else if (rejectionVideo.readyState >= 2) {
+            const rtt = REJECTION_START + pRej * (REJECTION_END - REJECTION_START);
+            if (Math.abs(rejectionVideo.currentTime - rtt) > 0.3) rejectionVideo.currentTime = rtt;
+        }
+
+        smokeLeft.style.display = 'block';
+        smokeRight.style.display = 'block';
+
+        const smokeOffset = pRej * 110;
+        const smokeFade = clamp((pRej - 0.5) / 0.5);
+        smokeLeft.style.transform = `translateX(-${smokeOffset}%)`;
+        smokeRight.style.transform = `translateX(${smokeOffset}%)`;
+        smokeLeft.style.opacity = 1 - smokeFade;
+        smokeRight.style.opacity = 1 - smokeFade;
+    } else {
+        smokeLeft.style.display = 'none';
+        smokeRight.style.display = 'none';
+        rejectionWrapper.style.display = 'none';
+    }
+
+    const learnRect = secLearning.getBoundingClientRect();
+    const pLearn = progress(learnRect, vh);
+
+    if (learnRect.top < vh && learnRect.bottom > 0) {
+        const sw = pLearn > 0.3 ? 1 : 0;
+        rejectionWrapper.style.display = sw ? 'none' : 'flex';
+        learningLayer.style.opacity = sw ? 1 : 0;
+        learningLayer.style.filter = 'none';
+    } else {
+        learningLayer.style.opacity = 0;
+        learningLayer.style.filter = 'none';
+    }
+
+    const violRect = secViolence.getBoundingClientRect();
+    const pViol = progress(violRect, vh);
+
+    if (violRect.top < vh && violRect.bottom > 0) {
+        learningLayer.style.opacity = 1 - clamp(pViol * 2.5);
+        learningLayer.style.filter = `brightness(${1 - pViol * 0.3}) sepia(${pViol * 0.9}) saturate(${1 + pViol * 3}) hue-rotate(${-pViol * 30}deg)`;
+
+        const violReveal = clamp((pViol - 0.4) / 0.3);
+        violenceLayer.style.opacity = violReveal;
+        violenceLayer.style.transform = `scale(${0.85 + violReveal * 0.15})`;
+
+        violenceRedCurtain.style.display = 'block';
+        let redOpacity;
+        if (pViol < 0.35) redOpacity = pViol / 0.35;
+        else if (pViol < 0.55) redOpacity = 1;
+        else redOpacity = 1 - (pViol - 0.55) / 0.45;
+        violenceRedCurtain.style.opacity = redOpacity * 0.9;
+    } else {
+        violenceRedCurtain.style.display = 'none';
+        violenceRedCurtain.style.opacity = 0;
+        violenceLayer.style.opacity = 0;
+        violenceLayer.style.transform = 'scale(0.85)';
+    }
+
+    const breakRect = secBreak.getBoundingClientRect();
+    const pBreak = progress(breakRect, vh);
+
+    if (breakRect.top < vh && breakRect.bottom > 0) {
+        const pShatter = clamp((pBreak - 0.2) / 0.3);
+
+        if (pShatter > 0) {
+            violenceLayer.style.opacity = 0;
+            breakContainer.style.opacity = 1;
+            for (let i = 0; i < fragments.length; i++) {
+                const d = fragData[i];
+                fragments[i].style.cssText = `animation:none;transform:translate(${d.tx * pShatter}vw,${d.ty * pShatter}vh) rotate(${d.rot * pShatter}deg);opacity:${1 - pShatter};background-image:url('images/violence.jpg');background-size:400% 300%;background-position:${fragments[i].style.backgroundPosition};`;
+            }
+        } else {
+            violenceLayer.style.opacity = 1;
+            breakContainer.style.opacity = 0;
+            for (let i = 0; i < fragments.length; i++) {
+                fragments[i].style.cssText = `animation:none;transform:translate(0,0) rotate(0deg);opacity:1;background-image:url('images/violence.jpg');background-size:400% 300%;background-position:${fragments[i].style.backgroundPosition};`;
+            }
+        }
+
+        confrontationLayer.style.opacity = clamp((pBreak - 0.4) / 0.6);
+    } else {
+        breakContainer.style.opacity = 0;
+        confrontationLayer.style.opacity = 0;
+        for (let i = 0; i < fragments.length; i++) {
+            fragments[i].style.cssText = `animation:none;transform:translate(0,0) rotate(0deg);opacity:1;background-image:url('images/violence.jpg');background-size:400% 300%;background-position:${fragments[i].style.backgroundPosition};`;
+        }
+    }
+
+    const endRect = secEnding.getBoundingClientRect();
+    if (endRect.top < vh) {
+        const pEnd = progress(endRect, vh);
+        confrontationLayer.style.opacity = 1;
+        endingLayer.style.opacity = clamp(pEnd * 2);
+    } else {
+        endingLayer.style.opacity = 0;
+    }
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+</script>
+
+</body>
+</html>

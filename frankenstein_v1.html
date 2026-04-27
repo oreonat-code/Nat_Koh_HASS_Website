@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frankenstein Combined Full</title>
+
+<style>
+*{ margin:0; padding:0; box-sizing:border-box; }
+
+body {
+    background: #000;
+    color: #fff;
+    font-family: Georgia, 'Times New Roman', serif;
+    overflow-x: hidden;
+}
+
+section { height: 200vh; position: relative; }
+
+/* INTRO */
+.intro-section { height: 300vh; }
+
+.intro-content {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    z-index: 10;
+}
+
+.intro-content h1 {
+    font-size: 4rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.intro-content p {
+    margin-top: 1rem;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    opacity: 0.6;
+}
+
+.intro-eye {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.intro-eye-inner {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1a1a2e 30%, #000 70%);
+    border: 3px solid #444;
+    position: relative;
+    overflow: hidden;
+}
+
+.intro-eye-pupil {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #0ff 0%, #006 60%, #000 100%);
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 20px #0ff, 0 0 40px #08f;
+}
+
+/* FIXED OVERLAY LAYERS */
+.fixed-layer {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 20;
+}
+
+/* CREATION IMAGE */
+#creation-layer {
+    background-image: url('images/creation.jpg');
+    background-size: cover;
+    background-position: center;
+    transform: scale(0.15);
+    border-radius: 50%;
+    transition: border-radius 0.8s ease;
+}
+
+#creation-layer.flat {
+    border-radius: 0;
+}
+
+/* ANNOTATION */
+#annotation-layer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 21;
+    font-size: 1.4rem;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 20px #000, 0 0 40px #000;
+    background: rgba(0,0,0,0.3);
+}
+
+/* LEARNING SCENE - iris reveal */
+#learning-layer {
+    background-image: url('images/learning.jpg');
+    background-size: cover;
+    background-position: center;
+    clip-path: circle(0% at 50% 50%);
+    z-index: 25;
+}
+
+/* RED OVERLAY on learning */
+#red-overlay {
+    background: rgba(180, 0, 0, 0);
+    z-index: 26;
+    transition: background 0.3s;
+}
+
+/* VIOLENCE SCENE */
+#violence-layer {
+    background-image: url('images/violence.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: 30;
+}
+
+/* CONFRONTATION */
+#confrontation-layer {
+    background-image: url('images/confrontation.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: 35;
+}
+
+/* BREAK APART FRAGMENTS */
+#break-container {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    z-index: 31;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    pointer-events: none;
+    opacity: 0;
+}
+
+.break-fragment {
+    background-image: url('images/violence.jpg');
+    background-size: 400% 300%;
+    width: 100%; height: 100%;
+    opacity: 1;
+}
+
+@keyframes fragmentFly {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) rotate(var(--rot)); opacity: 0; }
+}
+
+/* ENDING */
+#ending-layer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 40;
+}
+
+#ending-layer h1 {
+    font-size: 2.5rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 2rem;
+}
+
+.btn-row { display: flex; gap: 1rem; margin-top: 1rem; }
+
+.btn-row button {
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-family: Georgia, serif;
+    border: 2px solid #666;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.btn-row button:hover {
+    border-color: #c44;
+    color: #c44;
+    background: rgba(200, 50, 50, 0.1);
+}
+
+.btn-row button.selected {
+    border-color: #f55;
+    color: #f55;
+    background: rgba(200, 50, 50, 0.15);
+}
+
+#answer-reveal {
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    max-width: 500px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    letter-spacing: 0.03em;
+}
+
+#answer-reveal.visible { opacity: 1; }
+
+</style>
+</head>
+
+<body>
+
+<!-- SCROLL SECTIONS -->
+<section class="intro-section" id="sec-intro">
+    <div class="intro-content" id="intro-content">
+        <h1>Frankenstein</h1>
+        <p>Scroll to begin</p>
+    </div>
+</section>
+
+<section id="sec-zoom"></section>
+<section id="sec-creation-hold"></section>
+<section id="sec-fade-learning"></section>
+<section id="sec-learning-red"></section>
+<section id="sec-red-violence"></section>
+<section id="sec-violence-break"></section>
+<section id="sec-ending"></section>
+
+<!-- FIXED OVERLAY LAYERS -->
+<div class="fixed-layer" id="creation-layer"></div>
+<div class="fixed-layer" id="annotation-layer">The moment of creation</div>
+<div class="fixed-layer" id="learning-layer"></div>
+<div class="fixed-layer" id="red-overlay"></div>
+<div class="fixed-layer" id="violence-layer"></div>
+
+<div id="break-container"></div>
+
+<div class="fixed-layer" id="confrontation-layer"></div>
+<div class="fixed-layer" id="ending-layer">
+    <h1>Who is the real monster?</h1>
+    <div class="btn-row">
+        <button data-answer="victor">Victor</button>
+        <button data-answer="creature">Creature</button>
+        <button data-answer="both">Both</button>
+    </div>
+    <div id="answer-reveal"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const clamp = (v, lo=0, hi=1) => Math.max(lo, Math.min(hi, v));
+const progress = (rect, vh) => clamp(-rect.top / vh);
+
+const introContent = $('#intro-content');
+const creationLayer = $('#creation-layer');
+const annotationLayer = $('#annotation-layer');
+const learningLayer = $('#learning-layer');
+const redOverlay = $('#red-overlay');
+const violenceLayer = $('#violence-layer');
+const breakContainer = $('#break-container');
+const confrontationLayer = $('#confrontation-layer');
+const endingLayer = $('#ending-layer');
+
+const secIntro = $('#sec-intro');
+const secZoom = $('#sec-zoom');
+const secCreationHold = $('#sec-creation-hold');
+const secFadeLearning = $('#sec-fade-learning');
+const secLearningRed = $('#sec-learning-red');
+const secRedViolence = $('#sec-red-violence');
+const secViolenceBreak = $('#sec-violence-break');
+const secEnding = $('#sec-ending');
+
+// Build break fragments
+const cols = 4, rows = 3;
+const fragments = [];
+for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+        const frag = document.createElement('div');
+        frag.className = 'break-fragment';
+        const bgX = (c / (cols - 1)) * 100;
+        const bgY = (r / (rows - 1)) * 100;
+        frag.style.backgroundPosition = `${bgX}% ${bgY}%`;
+        frag.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}vw`);
+        frag.style.setProperty('--ty', `${(Math.random() - 0.5) * 200}vh`);
+        frag.style.setProperty('--rot', `${(Math.random() - 0.5) * 720}deg`);
+        breakContainer.appendChild(frag);
+        fragments.push(frag);
+    }
+}
+
+// Button answer logic
+const answerTexts = {
+    victor: 'Victor Frankenstein created the horror but refused to take responsibility. His ambition blinded him to the consequences — abandoning his creation set the tragedy in motion.',
+    creature: 'The Creature was born innocent, but cruelty and rejection twisted him into something monstrous. Society shaped the monster he became.',
+    both: 'Both are monstrous in their own way. Victor through neglect and hubris, the Creature through revenge. They are mirror images of each other — creator and creation, locked in destruction.'
+};
+
+document.querySelectorAll('.btn-row button').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.btn-row button').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        const reveal = $('#answer-reveal');
+        reveal.textContent = answerTexts[btn.dataset.answer];
+        reveal.classList.add('visible');
+    });
+});
+
+let breakTriggered = false;
+
+function onScroll() {
+    const vh = window.innerHeight;
+
+    // === INTRO: fade out title ===
+    const introRect = secIntro.getBoundingClientRect();
+    const pIntro = clamp(-introRect.top / (vh * 1.5));
+    introContent.style.opacity = 1 - pIntro;
+
+    // === CREATION ZOOM IN ===
+    const zoomRect = secZoom.getBoundingClientRect();
+    const pZoom = progress(zoomRect, vh);
+
+    if (zoomRect.top < vh) {
+        creationLayer.style.opacity = 1;
+        const scale = 0.15 + pZoom * 0.85;
+        const radius = Math.max(0, 50 - pZoom * 50);
+        creationLayer.style.transform = `scale(${scale})`;
+        creationLayer.style.borderRadius = `${radius}%`;
+    }
+
+    // Show annotation when fully zoomed
+    const holdRect = secCreationHold.getBoundingClientRect();
+    if (holdRect.top < vh * 0.5) {
+        annotationLayer.style.opacity = 1;
+    } else {
+        annotationLayer.style.opacity = 0;
+    }
+
+    // === FADE CREATION → LEARNING (iris reveal) ===
+    const fadeRect = secFadeLearning.getBoundingClientRect();
+    if (fadeRect.top < vh) {
+        const pFade = progress(fadeRect, vh);
+
+        // Creation fades away
+        creationLayer.style.opacity = 1 - pFade;
+        annotationLayer.style.opacity = Math.max(0, 1 - pFade * 3);
+
+        // Learning iris opens
+        learningLayer.style.opacity = 1;
+        const irisRadius = pFade * 80;
+        learningLayer.style.clipPath = `circle(${irisRadius}% at 50% 50%)`;
+    }
+
+    // === LEARNING TURNS RED ===
+    const redRect = secLearningRed.getBoundingClientRect();
+    if (redRect.top < vh) {
+        const pRed = progress(redRect, vh);
+        redOverlay.style.opacity = 1;
+        redOverlay.style.background = `rgba(180, 0, 0, ${pRed * 0.7})`;
+
+        // Also tint the learning layer
+        learningLayer.style.filter = `brightness(${1 - pRed * 0.5}) saturate(${1 + pRed * 2})`;
+    } else {
+        redOverlay.style.background = 'rgba(180, 0, 0, 0)';
+        learningLayer.style.filter = 'none';
+    }
+
+    // === RED LEARNING → VIOLENCE ===
+    const violRect = secRedViolence.getBoundingClientRect();
+    if (violRect.top < vh) {
+        const pViol = progress(violRect, vh);
+
+        // Learning + red fade out
+        learningLayer.style.opacity = 1 - pViol;
+        redOverlay.style.opacity = 1 - pViol;
+
+        // Violence fades in
+        violenceLayer.style.opacity = pViol;
+        violenceLayer.style.transform = `scale(${0.8 + pViol * 0.2})`;
+    } else if (redRect.top >= vh) {
+        violenceLayer.style.opacity = 0;
+    }
+
+    // === VIOLENCE BREAKS → CONFRONTATION ===
+    const breakRect = secViolenceBreak.getBoundingClientRect();
+    if (breakRect.top < vh) {
+        const pBreak = progress(breakRect, vh);
+
+        if (pBreak > 0.2 && !breakTriggered) {
+            breakTriggered = true;
+            violenceLayer.style.opacity = 0;
+            breakContainer.style.opacity = 1;
+
+            fragments.forEach(f => {
+                f.style.animation = `fragmentFly 0.8s ease-out forwards`;
+                f.style.animationDelay = `${Math.random() * 0.15}s`;
+            });
+        }
+
+        // Confrontation fades in
+        const pConf = clamp((pBreak - 0.4) / 0.6);
+        confrontationLayer.style.opacity = pConf;
+    }
+
+    // === ENDING ===
+    const endRect = secEnding.getBoundingClientRect();
+    if (endRect.top < vh) {
+        const pEnd = progress(endRect, vh);
+        endingLayer.style.opacity = clamp(pEnd * 2);
+    } else {
+        endingLayer.style.opacity = 0;
+    }
+}
+
+window.addEventListener('scroll', onScroll);
+onScroll();
+</script>
+
+</body>
+</html>
